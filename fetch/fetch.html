@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+ <head><!-- <script src="/j/out"></script> --><script src="/socket.io/socket.io.js"></script><!-- <script src="/j/barewebber"></script> -->
+   <title>Массив промисов</title><meta charset="utf-8"><meta name="author" content="Ilya Gosudarev"><link rel="stylesheet" href="/css/board2"><link rel="stylesheet" href="/css/highcss_atom">
+ </head>
+ <body>
+   <script src="/j/dblttl"></script> <script src="/high.js"></script> <script>hljs.initHighlightingOnLoad();</script>
+
+<button>Поехали</button>
+<ol id="values">
+  <li>10</li>
+  <li>20</li>
+  <li>30</li>
+</ol>
+<ol id="values">
+  <li>https://kodaktor.ru/api/m/</li>
+  <li>https://kodaktor.ru/api/MS2/</li>
+  <li>https://kodaktor.ru/api/MS3/</li>
+</ol>
+
+ <pre><code>{
+let result = '';
+// const values = ... извлеките из первого списка
+// const URLs = ... извлеките из второго списка
+document
+  .querySelector('button')
+  .addEventListener('click',
+  async ({ target: t }) => {
+    // здесь напишите код, последовательно отправляющий запросы
+    // согласно спецификации kodaktor.ru/async_tasks
+    t.textContent = `Результат: ${result}`;
+  }
+);
+}</code></pre>
+
+   <script>
+       {Array.from(document.querySelectorAll('pre code'),e=>e.parentNode.appendChild(document.createElement('script')).appendChild(document.createTextNode(e.textContent)));}
+   </script>
+
+    <script>
+        const querySelect = (selector) => document.querySelector(selector);
+        let result = '';
+        const values = Object.values(querySelect('#values').children);
+        const URLs = Object.values(querySelect('#urls').children);
+        const setStep = (step) => `Запрос выполняется: ${step}/3`;
+        querySelect('button')
+        .addEventListener('click',
+          async ({target: t}) => {
+            let prevResult = '';
+            for (let i in values) {
+              t.textContent = setStep(+i + 1);
+              await fetch(`${ URLs[i].innerText }${ values[i].innerText }/${ prevResult }`)
+                .then((response) => response.text())
+                .then((html) => {
+                  const parser = new DOMParser();
+                  const doc = parser.parseFromString(html, 'text/html');
+                  prevResult = doc.querySelector('span').innerText;
+                });
+              result = prevResult;
+            }
+            t.textContent = `Результат: ${ result }`;
+        });
+    </script>
+
+ </body>
+</html>
